@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    <%= title %>
+  </title>
+  <link rel='stylesheet' href='/css/style.css' />
+  <style>
+    .editing > .view { display: none; }
+    .completed { text-decoration: line-through; }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item">
+          Home
+        </a>
+
+        <a class="navbar-item">
+          Documentation
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              About
+            </a>
+            <a class="navbar-item">
+              Jobs
+            </a>
+            <a class="navbar-item">
+              Contact
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              Report an issue
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <button class="button is-link">
+              <%= user.username %>
+            </button>
+
+            <form action="/logout" method="post">
+              <button class="button is-light" type="submit">Sign out</button>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <section class="columns is-mobile is-centered mt-4">
+    <article class="panel column is-two-fifths">
+      <p class="panel-heading">
+        TODOS
+      </p>
+      <p class="panel-tabs">
+        <a <%- !filter ? 'class="is-active"' : '' %> href="/" >All</a>
+        <a <%- filter=='active' ? 'class="is-active"' : '' %> href="/active" >Active</a>
+        <a <%- filter=='completed' ? 'class="is-active"' : '' %> href="/completed">Completed</a>
+      </p>
+      <div class="panel-block">
+        <form action="/" method="post" class="container">
+          <!-- <input class="new-todo" name="title" placeholder="What needs to be done?" autofocus> -->
+          <p class="control has-icons-left">
+            <input class="input is-link" type="text" name="title" placeholder="What needs to be done?" autofocus>
+            <span class="icon is-left">
+              <i class="fas fa-search" aria-hidden="true"></i>
+            </span>
+          </p>
+          <% if (filter) { %>
+            <input type="hidden" name="filter" value="<%= filter %>" />
+            <% } %>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        </form>
+      </div>
+      <% if (activeCount + completedCount> 0) { %>
+        <div class="panel-block">
+          <form action="/toggle-all" method="post">
+            <input id="toggle-all" class="toggle-all" type="checkbox" name="completed" <%- activeCount==0 ? 'checked'
+              : '' %> onchange="this.form.submit();">
+            <label for="toggle-all">Mark all as complete</label>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          </form>
+        </div>
+        <% todos.forEach(function(todo) { %>
+          <div class="panel-block">
+            <div class="container">
+              <form action="<%= todo.url %>" method="post">
+                <div class="view">
+                  <input class="toggle" type="checkbox" name="completed" <%- todo.completed ? 'checked' : '' %> onchange="this.form.submit();">
+                  <label
+                    <%- todo.completed ? 'class = "completed" ' : '' %>
+                    ondblclick="this.closest('form').className = this.closest('form').className + ' editing'; 
+                                this.closest('form').querySelector('input.edit').focus(); 
+                                this.closest('form').querySelector('input.edit').className = this.closest('form').querySelector('input.edit').className.replace('is-hidden', ''); 
+                                this.closest('form').querySelector('input.edit').value = ''; 
+                                this.closest('form').querySelector('input.edit').value = '<%= todo.title %>';">
+                    <%= todo.title %>
+                  </label>
+                  <button class="button is-danger is-small mx-5" form="delete-<%= todo.id %>">Delete</button>
+                </div>
+                <input class="edit is-hidden input is-link" name="title" value="<%= todo.title %>"
+                  onkeyup="if (event.keyCode == 27) { 
+                    this.setAttribute('data-esc', ''); 
+                    this.closest('form').className = this.closest('form').className.replace('editing', ''); 
+                  }"
+                  onblur="if (this.getAttribute('data-esc') !== null) { 
+                          return this.removeAttribute('data-esc'); 
+                  } this.form.submit();">
+                <% if (filter) { %>
+                  <input type="hidden" name="filter" value="<%= filter %>" />
+                <% } %>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              </form>
+              <form id="delete-<%= todo.id %>" action="<%= todo.url %>/delete" method="post">
+                <% if (filter) { %>
+                  <input type="hidden" name="filter" value="<%= filter %>" />
+                  <% } %>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              </form>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+      <% if (activeCount + completedCount> 0) { %>
+        <div class="panel-block">
+          <span class="todo-count">
+            <strong>
+              <%= activeCount %>
+            </strong>
+            <%= pluralize('item', activeCount) %> left
+          </span>
+          <% if (completedCount> 0) { %>
+            <form action="/clear-completed" method="post">
+              <button class="button is-success is-small mx-2">Clear completed</button>
+              <% if (filter) { %>
+                <input type="hidden" name="filter" value="<%= filter %>" />
+              <% } %>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            </form>
+          <% } %>
+        </div>
+      <% } %>
+    </article>
+  </section>
+</body>
+
+</html>
