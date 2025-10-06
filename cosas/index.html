@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/green.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/reset.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Montserrat:wght@300&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <h1 class="titulo">Pantalla de Control</h1>
+  <div class="container">
+    <div class="div-column">
+      <form class="form_camaras" id="form">
+
+        <div class="element_form">
+          <label>Nombre de la Sala:</label>
+          <input type="text" id="nombreSala">
+        </div>
+
+        <div class="element_form">
+          <label>Enlace Jugador 1:</label>
+          <input type="text" id="enlaceJugador1">
+        </div>
+
+        <div class="element_form">
+          <label>Enlace Jugador 2:</label>
+          <input type="text" id="enlaceJugador2">
+        </div>
+
+        <div class="element_form">
+          <label>Nombre Juez 1:</label>
+          <input type="text" id="nombreJuez1">
+          <label>Enlace Juez 1:</label>
+          <input type="text" id="enlaceJuez1">
+        </div>
+
+        <div class="element_form">
+          <label>Nombre Juez 2:</label>
+          <input type="text" id="nombreJuez2">
+          <label>Enlace Juez 2:</label>
+          <input type="text" id="enlaceJuez2">
+        </div>
+
+        <div class="element_form">
+          <button id="btnForm" type="submit" class="btn_form"> Conectar </button>   
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="div-column">
+      <div class="links" id="links"></div>
+
+      <button class="btn_re_start" id="stop" >Encender/Apagar el Stop</button>
+
+      <button class="btn_re_start" id="restart">Re-start</button>
+    </div>
+  </div>
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>
